@@ -2,15 +2,17 @@ package ru.sbt.mipt.oop;
 
 import java.util.Collection;
 
-public class CloseAllDoors implements Action{
-    private final Collection<Room> rooms;
+public class HallDoorEventProcessor implements EventProcessor {
+    private final SmartHome smartHome;
 
-    CloseAllDoors(Collection<Room> rooms) {
-        if (rooms == null) throw new IllegalArgumentException("Null input");
-        this.rooms = rooms;
+    HallDoorEventProcessor(SmartHome smartHome) {
+        if (smartHome == null) throw new IllegalArgumentException("Null input");
+        this.smartHome = smartHome;
     }
 
-    public void act() {
+    @Override
+    public void processEvent() {
+        Collection<Room> rooms = smartHome.getRooms();
         for (Room room : rooms) {
             for (Light light : room.getLights()) {
                 light.setOn(false);
