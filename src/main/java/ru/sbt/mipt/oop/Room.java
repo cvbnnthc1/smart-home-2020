@@ -1,11 +1,12 @@
 package ru.sbt.mipt.oop;
 
 import java.util.Collection;
+import java.util.HashSet;
 
-public class Room {
-    private Collection<Light> lights;
-    private Collection<Door> doors;
-    private String name;
+public class Room implements Actionable{
+    private final Collection<Light> lights;
+    private final Collection<Door> doors;
+    private final String name;
 
     public Room(Collection<Light> lights, Collection<Door> doors, String name) {
         this.lights = lights;
@@ -13,33 +14,33 @@ public class Room {
         this.name = name;
     }
 
-    public Collection<Light> getLights() {
-        return lights;
-    }
-
-    public Collection<Door> getDoors() {
-        return doors;
-    }
-
     public String getName() {
         return name;
     }
 
-    public Light getLight(String id) {
-        for (Light light : lights) {
-            if (light.getId().equals(id)) {
-                return light;
-            }
+    Collection<String> doorsIds() {
+        HashSet<String> result = new HashSet<>();
+        for (Door door: doors) {
+            result.add(door.getId());
         }
-        return null;
+        return result;
     }
 
-    public Door getDoor(String id) {
-        for (Door door : doors) {
-            if (door.getId().equals(id)) {
-                return door;
-            }
-        }
-        return null;
+    @Override
+    public void execute(Action action) {
+        lights.stream().forEach(s -> {
+            action.execute(s);
+        });
+        doors.stream().forEach(s -> {
+            action.execute(s);
+        });
+    }
+
+    Collection<Door> getDoors() {
+        return doors;
+    }
+
+    Collection<Light> getLights() {
+        return lights;
     }
 }

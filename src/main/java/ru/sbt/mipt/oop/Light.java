@@ -1,6 +1,6 @@
 package ru.sbt.mipt.oop;
 
-public class Light {
+public class Light implements HomeComponent{
     private boolean isOn;
     private final String id;
 
@@ -9,7 +9,7 @@ public class Light {
         this.isOn = isOn;
     }
 
-    public boolean isOn() {
+    boolean isOn() {
         return isOn;
     }
 
@@ -17,7 +17,7 @@ public class Light {
         return id;
     }
 
-    public void setOn(boolean on) {
+    void setOn(boolean on) {
         isOn = on;
     }
 }

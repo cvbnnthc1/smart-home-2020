@@ -11,8 +11,8 @@ public class Application {
         SmartHome smartHome = reader.readSmartHome(source);
         // начинаем цикл обработки событий
         Sensor sensor = new RandomSensor();
-        ProcessingScript processor = new StandardProcessingScript();
-        processor.doScript(smartHome, sensor);
+        ProcessingScript processor = new StandardProcessingScript(smartHome, sensor);
+        processor.doScript();
     }
 
 

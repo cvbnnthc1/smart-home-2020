@@ -3,8 +3,14 @@ package ru.sbt.mipt.oop;
 import static ru.sbt.mipt.oop.SensorEventType.*;
 
 public class StandardProcessingScript implements ProcessingScript {
+    SmartHome smartHome;
+    Sensor sensor;
 
-    public void doScript(SmartHome smartHome, Sensor sensor) {
+    StandardProcessingScript(SmartHome smartHome, Sensor sensor) {
+        this.smartHome = smartHome;
+        this.sensor = sensor;
+    }
+    public void doScript() {
         SensorEvent event = sensor.getNextSensorEvent();
         while (event != null) {
             System.out.println("Got event: " + event);
@@ -20,8 +26,7 @@ public class StandardProcessingScript implements ProcessingScript {
 
                 // если мы получили событие о закрытие двери в холле - это значит, что была закрыта входная дверь.
                 // в этом случае мы хотим автоматически выключить свет во всем доме (это же умный дом!)
-                Room room = smartHome.getRoomByDoor(event.getObjectId());
-                if (room != null && event.getType() == DOOR_CLOSED && room.getName().equals("hall")) {
+                if (event.getType() == DOOR_CLOSED && smartHome.getEntranceDoorsIds().contains(event.getObjectId())) {
                     EventProcessor eventProcessor = new HallDoorEventProcessor(smartHome);
                     eventProcessor.processEvent();
                 }
