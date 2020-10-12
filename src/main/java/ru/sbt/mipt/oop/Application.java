@@ -11,8 +11,14 @@ public class Application {
         SmartHome smartHome = reader.readSmartHome(source);
         // начинаем цикл обработки событий
         Sensor sensor = new RandomSensor();
-        ProcessingScript processor = new StandardProcessingScript(smartHome, sensor);
-        processor.doScript();
+        Signalization signalization = new Signalization();
+        signalization.setState(new Deactivated(signalization));
+        ProcessingScript processor = new StandardProcessingScript(smartHome, signalization);
+        SensorEvent event = sensor.getNextSensorEvent();
+        while (event != null) {
+            processor.processEvent(event);
+            event = sensor.getNextSensorEvent();
+        }
     }
 
 

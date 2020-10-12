@@ -37,6 +37,6 @@ public class LightEventProcessorTest {
         Light result = smartHome.getRooms().iterator().next().getLights().iterator().next();
         //then
         assertEquals("1", result.getId());
-        assertTrue(result.isOn());
+        assertFalse(result.isOn());
     }
 }

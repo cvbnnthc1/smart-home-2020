@@ -20,13 +20,14 @@ public class StandardProcessingScriptTest {
     }
 
     @Test
-    public void doScript_offAllLightsAfterCloseEntranceDoor() {
+    public void processEvent_offAllLightsAfterCloseEntranceDoor() {
         //given
         ArrayList<SensorEvent> events = new ArrayList<>();
         events.add(new SensorEvent(SensorEventType.DOOR_CLOSED, "4"));
         //when
-        StandardProcessingScript standardProcessingScript = new StandardProcessingScript(smartHome, new MockSensor(events.iterator()));
-        standardProcessingScript.doScript();
+        Signalization signalization = new Signalization();
+        StandardProcessingScript standardProcessingScript = new StandardProcessingScript(smartHome, signalization);
+        for (SensorEvent event: events) standardProcessingScript.processEvent(event);
         //then
         for (Room room: smartHome.getRooms()) {
             for (Light light: room.getLights()) {
@@ -36,13 +37,14 @@ public class StandardProcessingScriptTest {
     }
 
     @Test
-    public void doScript_closeFirstDoor() {
+    public void processEvent_closeFirstDoor() {
         //given
         ArrayList<SensorEvent> events = new ArrayList<>();
         events.add(new SensorEvent(SensorEventType.DOOR_CLOSED, "1"));
         //when
-        StandardProcessingScript standardProcessingScript = new StandardProcessingScript(smartHome, new MockSensor(events.iterator()));
-        standardProcessingScript.doScript();
+        Signalization signalization = new Signalization();
+        StandardProcessingScript standardProcessingScript = new StandardProcessingScript(smartHome, signalization);
+        for (SensorEvent event: events) standardProcessingScript.processEvent(event);
         Door result = smartHome.getRooms().iterator().next().getDoors().iterator().next();
         //then
         assertEquals("1", result.getId());
@@ -50,13 +52,14 @@ public class StandardProcessingScriptTest {
     }
 
     @Test
-    public void doScript_openFirstDoor() {
+    public void processEvent_openFirstDoor() {
         //given
         ArrayList<SensorEvent> events = new ArrayList<>();
         events.add(new SensorEvent(SensorEventType.DOOR_OPEN, "1"));
         //when
-        StandardProcessingScript standardProcessingScript = new StandardProcessingScript(smartHome, new MockSensor(events.iterator()));
-        standardProcessingScript.doScript();
+        Signalization signalization = new Signalization();
+        StandardProcessingScript standardProcessingScript = new StandardProcessingScript(smartHome, signalization);
+        for (SensorEvent event: events) standardProcessingScript.processEvent(event);
         Door result = smartHome.getRooms().iterator().next().getDoors().iterator().next();
         //then
         assertEquals("1", result.getId());
@@ -64,13 +67,14 @@ public class StandardProcessingScriptTest {
     }
 
     @Test
-    public void doScript_offFirstDoor() {
+    public void processEvent_offFirstDoor() {
         //given
         ArrayList<SensorEvent> events = new ArrayList<>();
         events.add(new SensorEvent(SensorEventType.LIGHT_OFF, "1"));
         //when
-        StandardProcessingScript standardProcessingScript = new StandardProcessingScript(smartHome, new MockSensor(events.iterator()));
-        standardProcessingScript.doScript();
+        Signalization signalization = new Signalization();
+        StandardProcessingScript standardProcessingScript = new StandardProcessingScript(smartHome, signalization);
+        for (SensorEvent event: events) standardProcessingScript.processEvent(event);
         Light result = smartHome.getRooms().iterator().next().getLights().iterator().next();
         //then
         assertEquals("1", result.getId());
@@ -78,33 +82,19 @@ public class StandardProcessingScriptTest {
     }
 
     @Test
-    public void doScript_onFirstDoor() {
+    public void processEvent_onFirstDoor() {
         //given
         ArrayList<SensorEvent> events = new ArrayList<>();
         events.add(new SensorEvent(SensorEventType.LIGHT_ON, "1"));
         //when
-        StandardProcessingScript standardProcessingScript = new StandardProcessingScript(smartHome, new MockSensor(events.iterator()));
-        standardProcessingScript.doScript();
+        Signalization signalization = new Signalization();
+        StandardProcessingScript standardProcessingScript = new StandardProcessingScript(smartHome, signalization);
+        for (SensorEvent event: events) standardProcessingScript.processEvent(event);
         Light result = smartHome.getRooms().iterator().next().getLights().iterator().next();
         //then
         assertEquals("1", result.getId());
         assertTrue(result.isOn());
     }
 
-    class MockSensor implements Sensor {
-        Iterator<SensorEvent> iterator;
-        MockSensor(Iterator<SensorEvent> iterator) {
-            this.iterator = iterator;
-        }
-
-        @Override
-        public SensorEvent getNextSensorEvent() {
-            if (iterator.hasNext()) {
-                return iterator.next();
-            } else {
-                return null;
-            }
-        }
-    }
 
 }
