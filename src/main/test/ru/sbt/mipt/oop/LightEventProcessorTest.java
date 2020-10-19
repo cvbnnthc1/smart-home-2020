@@ -19,9 +19,9 @@ public class LightEventProcessorTest {
     @Test
     public void processEvent_onFirstLight() {
         //given
-        LightEventProcessor lightEventProcessor = new LightEventProcessor(smartHome, new SensorEvent(SensorEventType.LIGHT_ON, "1"));
+        LightEventProcessor lightEventProcessor = new LightEventProcessor(smartHome);
         //when
-        lightEventProcessor.processEvent();
+        lightEventProcessor.processEvent(new SensorEvent(SensorEventType.LIGHT_ON, "1"));
         Light result = smartHome.getRooms().iterator().next().getLights().iterator().next();
         //then
         assertEquals("1", result.getId());
@@ -31,12 +31,14 @@ public class LightEventProcessorTest {
     @Test
     public void processEvent_offFirstLight() {
         //given
-        LightEventProcessor lightEventProcessor = new LightEventProcessor(smartHome, new SensorEvent(SensorEventType.LIGHT_OFF, "1"));
+        LightEventProcessor lightEventProcessor = new LightEventProcessor(smartHome);
         //when
-        lightEventProcessor.processEvent();
+        lightEventProcessor.processEvent(new SensorEvent(SensorEventType.LIGHT_OFF, "1"));
         Light result = smartHome.getRooms().iterator().next().getLights().iterator().next();
         //then
         assertEquals("1", result.getId());
-        assertTrue(result.isOn());
+        assertFalse(result.isOn());
     }
+
+
 }

@@ -1,39 +1,38 @@
 package ru.sbt.mipt.oop;
 
 import static ru.sbt.mipt.oop.SensorEventType.LIGHT_ON;
+import static ru.sbt.mipt.oop.SensorEventType.LIGHT_OFF;
 
 public class LightEventProcessor implements EventProcessor {
     private final SmartHome smartHome;
-    private final SensorEvent event;
 
-    LightEventProcessor(SmartHome smartHome, SensorEvent event) {
-        if (smartHome == null || event == null) throw new IllegalArgumentException("Null input");
+    LightEventProcessor(SmartHome smartHome) {
+        if (smartHome == null) throw new IllegalArgumentException("Null input");
         this.smartHome = smartHome;
-        this.event = event;
     }
 
     @Override
-    public void processEvent() {
+    public void processEvent(SensorEvent event) {
         if (event.getType() == LIGHT_ON) {
-            Action lightOn = new Action(s -> {
+            smartHome.execute(s -> {
                 if (s instanceof Light && s.getId().equals(event.getObjectId())) {
                     Light light = (Light) s;
                     light.setOn(true);
                     System.out.println("Light " + light.getId() + " was on.");
+                    return true;
                 }
-                return null;
+                return false;
             });
-            smartHome.execute(lightOn);
-        } else {
-            Action lightOff = new Action(s -> {
+        } else if (event.getType() == LIGHT_OFF) {
+            smartHome.execute(s -> {
                 if (s instanceof Light && s.getId().equals(event.getObjectId())) {
                     Light light = (Light) s;
                     light.setOn(false);
                     System.out.println("Light " + light.getId() + " was off.");
+                    return true;
                 }
-                return null;
+                return false;
             });
-            smartHome.execute(lightOff);
         }
     }
 }

@@ -3,6 +3,7 @@ package ru.sbt.mipt.oop;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.function.Function;
 
 public class SmartHome implements Actionable{
     private final Collection<Room> rooms;
@@ -15,20 +16,12 @@ public class SmartHome implements Actionable{
         this.rooms = rooms;
     }
 
-    Collection<String> getEntranceDoorsIds() {
-        for (Room room: rooms) {
-            if (room.getName().equals("hall")) {
-                return room.doorsIds();
-            }
-        }
-        return null;
-    }
-
     @Override
-    public void execute(Action action) {
-        rooms.stream().forEach(s -> s.execute(action));
+    public boolean execute(Function<HomeComponent, Boolean> action) {
+        return rooms.stream().map(s -> s.execute(action)).reduce((x, y) -> x || y).get();
     }
 
+    //Метод для  юнит-тестов
     Collection<Room> getRooms() {
         return rooms;
     }

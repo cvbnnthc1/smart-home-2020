@@ -1,5 +1,7 @@
 package ru.sbt.mipt.oop;
 
+import java.util.function.Function;
+
 public interface Actionable {
-    void execute(Action action);
+    boolean execute(Function<HomeComponent, Boolean> action);
 }
