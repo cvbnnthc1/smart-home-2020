@@ -1,15 +1,14 @@
 package ru.sbt.mipt.oop;
 
 import static ru.sbt.mipt.oop.SensorEventType.LIGHT_ON;
+import static ru.sbt.mipt.oop.SensorEventType.LIGHT_OFF;
 
 public class LightEventProcessor implements EventProcessor {
     private final SmartHome smartHome;
-    private final SensorEvent event;
 
-    LightEventProcessor(SmartHome smartHome, SensorEvent event) {
-        if (smartHome == null || event == null) throw new IllegalArgumentException("Null input");
+    LightEventProcessor(SmartHome smartHome) {
+        if (smartHome == null) throw new IllegalArgumentException("Null input");
         this.smartHome = smartHome;
-        this.event = event;
     }
 
     private void lightOn(Light light, Room room) {
@@ -23,14 +22,16 @@ public class LightEventProcessor implements EventProcessor {
     }
 
     @Override
-    public void processEvent() {
-        Room room = smartHome.getRoomByLight(event.getObjectId());
-        if (room != null) {
-            Light light = room.getLight(event.getObjectId());
-            if (event.getType() == LIGHT_ON) {
-                lightOn(light, room);
-            } else {
-                lightOff(light, room);
+    public void processEvent(SensorEvent event) {
+        if (event.getType() == LIGHT_ON || event.getType() == LIGHT_OFF) {
+            Room room = smartHome.getRoomByLight(event.getObjectId());
+            if (room != null) {
+                Light light = room.getLight(event.getObjectId());
+                if (event.getType() == LIGHT_ON) {
+                    lightOn(light, room);
+                } else {
+                    lightOff(light, room);
+                }
             }
         }
     }
