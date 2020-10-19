@@ -1,10 +1,8 @@
 package ru.sbt.mipt.oop;
 
-
 import java.util.Collection;
 
 public class StandardProcessingScript implements ProcessingScript {
-
     private final Collection<EventProcessor> processors;
 
     public StandardProcessingScript(Collection<EventProcessor> processors) {

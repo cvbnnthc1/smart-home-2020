@@ -1,11 +1,12 @@
 package ru.sbt.mipt.oop;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 public class Application {
 
-    public static void main(String... args) {
+    public static void main(String... args) throws IOException {
         // считываем состояние дома из файла
         SmartHomeReader reader = new SmartHomeJSONReader();
         String source = "smart-home-1.js";
@@ -19,6 +20,5 @@ public class Application {
         ProcessingScript processor = new StandardProcessingScript(processors);
         processor.executeScript(smartHome, sensorEventProvider);
     }
-
 
 }
