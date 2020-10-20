@@ -12,13 +12,14 @@ public class Application {
         String source = "smart-home-1.js";
         SmartHome smartHome = reader.readSmartHome(source);
         // начинаем цикл обработки событий
-        Sensor sensor = new RandomSensor();
+        SensorEventProvider sensor = new RandomSensorEventProvider();
         Signalization signalization = new Signalization();
         signalization.setState(new Deactivated(signalization));
         List<EventProcessor> processors = new ArrayList<>();
         processors.add(new DoorEventProcessor(smartHome));
         processors.add(new LightEventProcessor(smartHome));
         processors.add(new HallDoorEventProcessor(smartHome));
+        processors.add(new SignalizationEventProcessor(signalization));
         ProcessingScript processor = new StandardProcessingScript(smartHome, signalization, processors);
         SensorEvent event = sensor.getNextSensorEvent();
         while (event != null) {
