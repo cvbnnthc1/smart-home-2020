@@ -20,4 +20,5 @@ public class Light implements HomeComponent{
     void setOn(boolean on) {
         isOn = on;
     }
+
 }

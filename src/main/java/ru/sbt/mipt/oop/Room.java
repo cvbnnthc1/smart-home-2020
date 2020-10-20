@@ -2,6 +2,7 @@ package ru.sbt.mipt.oop;
 
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.function.Function;
 
 public class Room implements Actionable{
     private final Collection<Light> lights;
@@ -18,29 +19,22 @@ public class Room implements Actionable{
         return name;
     }
 
-    Collection<String> doorsIds() {
-        HashSet<String> result = new HashSet<>();
-        for (Door door: doors) {
-            result.add(door.getId());
-        }
-        return result;
+    @Override
+    public boolean execute(Function<HomeComponent, Boolean> action) {
+        Boolean resultLights;
+        Boolean resultDoors;
+        resultLights = lights.stream().map(s -> action.apply(s)).reduce((x, y) -> x || y).get();
+        resultDoors = doors.stream().map(s -> action.apply(s)).reduce((x, y) -> x || y).get();
+        return resultLights || resultDoors;
     }
 
-    @Override
-    public void execute(Action action) {
-        lights.stream().forEach(s -> {
-            action.execute(s);
-        });
-        doors.stream().forEach(s -> {
-            action.execute(s);
-        });
+    //Методы для юнит тестов
+    Collection<Light> getLights() {
+        return lights;
     }
 
     Collection<Door> getDoors() {
         return doors;
     }
 
-    Collection<Light> getLights() {
-        return lights;
-    }
 }

@@ -21,7 +21,7 @@ public class HallDoorEventProcessorTest {
         //given
         HallDoorEventProcessor hallDoorEventProcessor = new HallDoorEventProcessor(smartHome);
         //when
-        hallDoorEventProcessor.processEvent();
+        hallDoorEventProcessor.processEvent(new SensorEvent(SensorEventType.DOOR_CLOSED, "4"));
         //then
         for (Room room: smartHome.getRooms()) {
             for (Light light: room.getLights()) {
@@ -36,9 +36,9 @@ public class HallDoorEventProcessorTest {
         HallDoorEventProcessor hallDoorEventProcessor = new HallDoorEventProcessor(smartHome);
         //when
         for (int i = 1; i < 10; i++) {
-            new LightEventProcessor(smartHome, new SensorEvent(SensorEventType.LIGHT_ON, "" + i)).processEvent();
+            new LightEventProcessor(smartHome).processEvent(new SensorEvent(SensorEventType.LIGHT_ON, "" + i));
         }
-        hallDoorEventProcessor.processEvent();
+        hallDoorEventProcessor.processEvent(new SensorEvent(SensorEventType.DOOR_CLOSED, "4"));
         //then
         for (Room room: smartHome.getRooms()) {
             for (Light light: room.getLights()) {
@@ -46,4 +46,6 @@ public class HallDoorEventProcessorTest {
             }
         }
     }
+
+
 }

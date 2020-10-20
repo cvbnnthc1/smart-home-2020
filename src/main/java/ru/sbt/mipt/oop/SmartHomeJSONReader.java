@@ -5,7 +5,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
-public class SmartHomeJSONReader implements SmartHomeReader{
+public class SmartHomeJSONReader implements SmartHomeReader {
 
     public  SmartHome readSmartHome(String source) {
         Gson gson = new Gson();
