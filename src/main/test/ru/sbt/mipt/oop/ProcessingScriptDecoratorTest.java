@@ -4,11 +4,13 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import static org.junit.Assert.*;
 
 public class ProcessingScriptDecoratorTest {
     static SmartHome smartHome;
+    static List<EventProcessor> processors;
 
     @Before
     public void readHome() {
@@ -16,6 +18,10 @@ public class ProcessingScriptDecoratorTest {
         String source = "smart-home-1.js";
         SmartHome smartHome = reader.readSmartHome(source);
         this.smartHome = smartHome;
+        this.processors = new ArrayList<>();
+        processors.add(new DoorEventProcessor(smartHome));
+        processors.add(new LightEventProcessor(smartHome));
+        processors.add(new HallDoorEventProcessor(smartHome));
     }
 
     @Test
@@ -26,7 +32,7 @@ public class ProcessingScriptDecoratorTest {
         //when
         Signalization signalization = new Signalization();
         signalization.setState(new Activated(signalization,3));
-        ProcessingScript standardProcessingScript = new ProcessingScriptDecorator(new StandardProcessingScript(smartHome, signalization), signalization);
+        ProcessingScript standardProcessingScript = new ProcessingScriptDecorator(new StandardProcessingScript(smartHome, signalization, processors), signalization);
         for (SensorEvent event: events) standardProcessingScript.processEvent(event);
         //then
         for (Room room: smartHome.getRooms()) {
@@ -45,7 +51,7 @@ public class ProcessingScriptDecoratorTest {
         //when
         Signalization signalization = new Signalization();
         signalization.setState(new Activated(signalization,123));
-        ProcessingScript standardProcessingScript = new ProcessingScriptDecorator(new StandardProcessingScript(smartHome, signalization), signalization);
+        ProcessingScript standardProcessingScript = new ProcessingScriptDecorator(new StandardProcessingScript(smartHome, signalization, processors), signalization);
         for (SensorEvent event: events) standardProcessingScript.processEvent(event);
         //then
         boolean result = false;
@@ -66,7 +72,7 @@ public class ProcessingScriptDecoratorTest {
         //when
         Signalization signalization = new Signalization();
         signalization.setState(new Activated(signalization,123));
-        ProcessingScript standardProcessingScript = new ProcessingScriptDecorator(new StandardProcessingScript(smartHome, signalization), signalization);
+        ProcessingScript standardProcessingScript = new ProcessingScriptDecorator(new StandardProcessingScript(smartHome, signalization, processors), signalization);
         for (SensorEvent event: events) standardProcessingScript.processEvent(event);
         Door result = smartHome.getRooms().iterator().next().getDoors().iterator().next();
         //then
@@ -82,7 +88,7 @@ public class ProcessingScriptDecoratorTest {
         //when
         Signalization signalization = new Signalization();
         signalization.setState(new Alarm(signalization));
-        ProcessingScript standardProcessingScript = new ProcessingScriptDecorator(new StandardProcessingScript(smartHome, signalization), signalization);
+        ProcessingScript standardProcessingScript = new ProcessingScriptDecorator(new StandardProcessingScript(smartHome, signalization, processors), signalization);
         for (SensorEvent event: events) standardProcessingScript.processEvent(event);
         Door result = smartHome.getRooms().iterator().next().getDoors().iterator().next();
         //then
@@ -98,7 +104,7 @@ public class ProcessingScriptDecoratorTest {
         //when
         Signalization signalization = new Signalization();
         signalization.setState(new Alarm(signalization));
-        ProcessingScript standardProcessingScript = new ProcessingScriptDecorator(new StandardProcessingScript(smartHome, signalization), signalization);
+        ProcessingScript standardProcessingScript = new ProcessingScriptDecorator(new StandardProcessingScript(smartHome, signalization, processors), signalization);
         for (SensorEvent event: events) standardProcessingScript.processEvent(event);
         Door result = smartHome.getRooms().iterator().next().getDoors().iterator().next();
         //then
