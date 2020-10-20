@@ -1,6 +1,8 @@
 package ru.sbt.mipt.oop;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Application {
 
@@ -13,13 +15,16 @@ public class Application {
         Sensor sensor = new RandomSensor();
         Signalization signalization = new Signalization();
         signalization.setState(new Deactivated(signalization));
-        ProcessingScript processor = new StandardProcessingScript(smartHome, signalization);
+        List<EventProcessor> processors = new ArrayList<>();
+        processors.add(new DoorEventProcessor(smartHome));
+        processors.add(new LightEventProcessor(smartHome));
+        processors.add(new HallDoorEventProcessor(smartHome));
+        ProcessingScript processor = new StandardProcessingScript(smartHome, signalization, processors);
         SensorEvent event = sensor.getNextSensorEvent();
         while (event != null) {
             processor.processEvent(event);
             event = sensor.getNextSensorEvent();
         }
     }
-
-
+    
 }

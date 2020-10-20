@@ -1,39 +1,40 @@
 package ru.sbt.mipt.oop;
 
+import java.util.function.Function;
+
+import static ru.sbt.mipt.oop.SensorEventType.DOOR_CLOSED;
 import static ru.sbt.mipt.oop.SensorEventType.DOOR_OPEN;
 
 public class DoorEventProcessor implements EventProcessor {
     private final SmartHome smartHome;
-    private final SensorEvent event;
 
-    DoorEventProcessor(SmartHome smartHome, SensorEvent event) {
-        if (smartHome == null || event == null) throw new IllegalArgumentException("Null input");
+    DoorEventProcessor(SmartHome smartHome) {
+        if (smartHome == null) throw new IllegalArgumentException("Null input");
         this.smartHome = smartHome;
-        this.event = event;
     }
 
     @Override
-    public void processEvent() {
+    public void processEvent(SensorEvent event) {
         if (event.getType() == DOOR_OPEN) {
-            Action doorOpen = new Action(s -> {
+            smartHome.execute(s -> {
                 if (s instanceof Door && s.getId().equals(event.getObjectId())) {
                     Door door = (Door) s;
                     door.setOpen(true);
                     System.out.println("Door " + door.getId() + " was opened.");
+                    return true;
                 }
-                return null;
+                return false;
             });
-            smartHome.execute(doorOpen);
-        } else {
-            Action doorClose = new Action(s -> {
+        } else if (event.getType() == DOOR_CLOSED) {
+            smartHome.execute(s -> {
                 if (s instanceof Door && s.getId().equals(event.getObjectId())) {
                     Door door = (Door) s;
                     door.setOpen(false);
                     System.out.println("Door " + door.getId() + " was closed.");
+                    return true;
                 }
-                return null;
+                return false;
             });
-            smartHome.execute(doorClose);
         }
     }
 }

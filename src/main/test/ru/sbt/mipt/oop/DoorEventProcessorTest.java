@@ -19,9 +19,9 @@ public class DoorEventProcessorTest {
     @Test
     public void processEvent_openFirstDoor() {
         //given
-        DoorEventProcessor doorEventProcessor = new DoorEventProcessor(smartHome, new SensorEvent(SensorEventType.DOOR_OPEN, "1"));
+        DoorEventProcessor doorEventProcessor = new DoorEventProcessor(smartHome);
         //when
-        doorEventProcessor.processEvent();
+        doorEventProcessor.processEvent(new SensorEvent(SensorEventType.DOOR_OPEN, "1"));
         Door result = smartHome.getRooms().iterator().next().getDoors().iterator().next();
         //then
         assertEquals("1", result.getId());
@@ -31,12 +31,14 @@ public class DoorEventProcessorTest {
     @Test
     public void processEvent_closeFirstDoor() {
         //given
-        DoorEventProcessor doorEventProcessor = new DoorEventProcessor(smartHome, new SensorEvent(SensorEventType.DOOR_CLOSED, "1"));
+        DoorEventProcessor doorEventProcessor = new DoorEventProcessor(smartHome);
         //when
-        doorEventProcessor.processEvent();
+        doorEventProcessor.processEvent(new SensorEvent(SensorEventType.DOOR_CLOSED, "1"));
         Door result = smartHome.getRooms().iterator().next().getDoors().iterator().next();
         //then
         assertEquals("1", result.getId());
         assertFalse(result.isOpen());
     }
+
+
 }
