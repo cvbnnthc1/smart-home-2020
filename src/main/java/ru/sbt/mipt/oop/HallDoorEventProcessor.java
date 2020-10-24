@@ -12,9 +12,12 @@ public class HallDoorEventProcessor implements EventProcessor {
     public void processEvent(SensorEvent event) {
         if (event.getType() == SensorEventType.DOOR_CLOSED) {
             boolean isCloseHallDoor = smartHome.execute(s -> {
-                if (s instanceof Door && s.getId().equals(event.getObjectId())
-                        && (((Door) s).getRoomName().equals("hall"))) {
-                    return true;
+                if (s instanceof Door) {
+                    Door door = (Door) s;
+                    if (door.getId().equals(event.getObjectId())
+                            && door.getRoomName().equals("hall")) {
+                        return true;
+                    }
                 }
                 return false;
             });
