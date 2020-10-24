@@ -1,7 +1,6 @@
 package ru.sbt.mipt.oop;
 
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.function.Function;
 
 public class Room implements Actionable{
@@ -20,21 +19,13 @@ public class Room implements Actionable{
     }
 
     @Override
-    public boolean execute(Function<HomeComponent, Boolean> action) {
+    public boolean execute(Function<Actionable, Boolean> action) {
+        action.apply(this);
         Boolean resultLights;
         Boolean resultDoors;
-        resultLights = lights.stream().map(s -> action.apply(s)).reduce((x, y) -> x || y).get();
-        resultDoors = doors.stream().map(s -> action.apply(s)).reduce((x, y) -> x || y).get();
+        resultLights = lights.stream().map(s -> s.execute(action)).reduce((x, y) -> x || y).get();
+        resultDoors = doors.stream().map(s -> s.execute(action)).reduce((x, y) -> x || y).get();
         return resultLights || resultDoors;
-    }
-
-    //Методы для юнит тестов
-    Collection<Light> getLights() {
-        return lights;
-    }
-
-    Collection<Door> getDoors() {
-        return doors;
     }
 
 }

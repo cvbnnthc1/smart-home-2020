@@ -1,6 +1,8 @@
 package ru.sbt.mipt.oop;
 
-public class Light implements HomeComponent{
+import java.util.function.Function;
+
+public class Light implements HomeComponent, Actionable{
     private boolean isOn;
     private final String id;
 
@@ -21,4 +23,8 @@ public class Light implements HomeComponent{
         isOn = on;
     }
 
+    @Override
+    public boolean execute(Function<Actionable, Boolean> action) {
+        return action.apply(this);
+    }
 }

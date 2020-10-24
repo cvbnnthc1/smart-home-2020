@@ -1,6 +1,8 @@
 package ru.sbt.mipt.oop;
 
-public class Door implements HomeComponent {
+import java.util.function.Function;
+
+public class Door implements HomeComponent, Actionable {
     private final String id;
     private boolean isOpen;
     private final String roomName;
@@ -25,5 +27,10 @@ public class Door implements HomeComponent {
 
     String getRoomName() {
         return roomName;
+    }
+
+    @Override
+    public boolean execute(Function<Actionable, Boolean> action) {
+        return action.apply(this);
     }
 }
