@@ -20,7 +20,7 @@ public class Application {
         processors.add(new LightEventProcessor(smartHome));
         processors.add(new HallDoorEventProcessor(smartHome));
         processors.add(new SignalizationEventProcessor(signalization));
-        ProcessingScript processor = new StandardProcessingScript(smartHome, signalization, processors);
+        ProcessingScript processor = new StandardProcessingScript(processors);
         SensorEvent event = sensor.getNextSensorEvent();
         while (event != null) {
             processor.processEvent(event);
