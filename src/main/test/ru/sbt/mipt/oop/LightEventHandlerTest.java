@@ -10,7 +10,7 @@ import java.util.Map;
 
 import static org.junit.Assert.*;
 
-public class HallDoorEventProcessorTest {
+public class LightEventHandlerTest {
     SmartHome smartHome;
     Map<String, List<Door>> doorsByRoom = new HashMap<>();
     Map<String, List<Light>> lightsByRoom = new HashMap<>();
@@ -39,34 +39,27 @@ public class HallDoorEventProcessorTest {
     }
 
     @Test
-    public void processEvent_offAllLights() {
+    public void processEvent_onFirstLight() {
         //given
-        HallDoorEventProcessor hallDoorEventProcessor = new HallDoorEventProcessor(smartHome);
+        LightEventHandler lightEventProcessor = new LightEventHandler(smartHome);
         //when
-        hallDoorEventProcessor.processEvent(new SensorEvent(SensorEventType.DOOR_CLOSED, "4"));
+        lightEventProcessor.processEvent(new SensorEvent(SensorEventType.LIGHT_ON, "1"));
+        Light result = lightsByRoom.get("kitchen").get(0);
         //then
-        for (String room: lightsByRoom.keySet()) {
-            for (Light light: lightsByRoom.get(room)) {
-                assertFalse(light.isOn());
-            }
-        }
+        assertEquals("1", result.getId());
+        assertTrue(result.isOn());
     }
 
     @Test
-    public void processEvent_offAllLightsAfterOnAllLights() {
+    public void processEvent_offFirstLight() {
         //given
-        HallDoorEventProcessor hallDoorEventProcessor = new HallDoorEventProcessor(smartHome);
+        LightEventHandler lightEventProcessor = new LightEventHandler(smartHome);
         //when
-        for (int i = 1; i < 10; i++) {
-            new LightEventProcessor(smartHome).processEvent(new SensorEvent(SensorEventType.LIGHT_ON, "" + i));
-        }
-        hallDoorEventProcessor.processEvent(new SensorEvent(SensorEventType.DOOR_CLOSED, "4"));
+        lightEventProcessor.processEvent(new SensorEvent(SensorEventType.LIGHT_OFF, "1"));
+        Light result = lightsByRoom.get("kitchen").get(0);
         //then
-        for (String room: lightsByRoom.keySet()) {
-            for (Light light: lightsByRoom.get(room)) {
-                assertFalse(light.isOn());
-            }
-        }
+        assertEquals("1", result.getId());
+        assertFalse(result.isOn());
     }
 
 

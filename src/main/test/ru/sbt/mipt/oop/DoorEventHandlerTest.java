@@ -7,7 +7,7 @@ import java.util.*;
 
 import static org.junit.Assert.*;
 
-public class DoorEventProcessorTest {
+public class DoorEventHandlerTest {
     SmartHome smartHome;
     Map<String, List<Door>> doorsByRoom = new HashMap<>();
     Map<String, List<Light>> lightsByRoom = new HashMap<>();
@@ -38,7 +38,7 @@ public class DoorEventProcessorTest {
     @Test
     public void processEvent_openFirstDoor() {
         //given
-        DoorEventProcessor doorEventProcessor = new DoorEventProcessor(smartHome);
+        DoorEventHandler doorEventProcessor = new DoorEventHandler(smartHome);
         //when
         doorEventProcessor.processEvent(new SensorEvent(SensorEventType.DOOR_OPEN, "1"));
         Door result = doorsByRoom.get("kitchen").get(0);
@@ -50,7 +50,7 @@ public class DoorEventProcessorTest {
     @Test
     public void processEvent_closeFirstDoor() {
         //given
-        DoorEventProcessor doorEventProcessor = new DoorEventProcessor(smartHome);
+        DoorEventHandler doorEventProcessor = new DoorEventHandler(smartHome);
         //when
         doorEventProcessor.processEvent(new SensorEvent(SensorEventType.DOOR_CLOSED, "1"));
         Door result = doorsByRoom.get("kitchen").get(0);

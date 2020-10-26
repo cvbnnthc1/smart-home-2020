@@ -1,9 +1,9 @@
 package ru.sbt.mipt.oop;
 
-public class HallDoorEventProcessor implements EventProcessor {
+public class HallDoorEventHandler implements EventHandler {
     private final SmartHome smartHome;
 
-    HallDoorEventProcessor(SmartHome smartHome) {
+    HallDoorEventHandler(SmartHome smartHome) {
         if (smartHome == null) throw new IllegalArgumentException("Null input");
         this.smartHome = smartHome;
     }

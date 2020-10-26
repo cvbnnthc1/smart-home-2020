@@ -1,5 +1,5 @@
 package ru.sbt.mipt.oop;
 
-public interface ProcessingScript {
+public interface EventHandler {
     public void processEvent(SensorEvent event);
 }

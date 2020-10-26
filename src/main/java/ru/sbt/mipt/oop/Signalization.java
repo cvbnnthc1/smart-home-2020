@@ -3,6 +3,8 @@ package ru.sbt.mipt.oop;
 public class Signalization {
     private SignalizationState signalizationState;
 
+    public Signalization() {};
+
     public void execute(SensorEvent event) {
         if (signalizationState instanceof Activated) {
             handleEventWhenActivated(event);
@@ -55,4 +57,5 @@ public class Signalization {
             signalizationState.deactivate();
         }
     }
+
 }
