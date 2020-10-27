@@ -16,7 +16,7 @@ public class EventManagerConfiguration {
     Signalization signalization() {
         Signalization signalization = new Signalization();
         signalization.setState(new Deactivated(signalization));
-        return new Signalization();
+        return signalization;
     }
 
     @Bean
