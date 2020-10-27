@@ -28,7 +28,7 @@ public class Activated extends SignalizationState {
             System.out.println("Signalization is not in Alarm state, queerly...");
             alarm();
         } else {
-            System.out.println("Event when signaliztazion activated");
+            System.out.println("Event when signalization activated");
             alarm();
         }
     }
