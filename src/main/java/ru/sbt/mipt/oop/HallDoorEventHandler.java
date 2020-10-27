@@ -29,7 +29,7 @@ public class HallDoorEventHandler implements EventHandler {
                         Light light = (Light) s;
                         light.setOn(false);
                         SensorCommand command = new SensorCommand(CommandType.LIGHT_OFF, light.getId());
-                        System.out.println("Pretent we're sending command " + command);
+                        commandSender.sendCommand(command);
                         return true;
                     }
                     return false;
