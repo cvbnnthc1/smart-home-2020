@@ -46,7 +46,7 @@ public class EventManagerConfiguration {
 
     @Bean
     EventHandler hallDoorEventHandler() {
-        return new EventHandlerDecorator(new HallDoorEventHandler(smartHome()), signalization());
+        return new EventHandlerDecorator(new HallDoorEventHandler(smartHome(), commandSender()), signalization());
     }
 
     @Bean
@@ -66,5 +66,9 @@ public class EventManagerConfiguration {
                 signalizationEventHandler()};
     }
 
+    @Bean
+    CommandSender commandSender() {
+        return new CommandSenderImpl();
+    }
 
 }
