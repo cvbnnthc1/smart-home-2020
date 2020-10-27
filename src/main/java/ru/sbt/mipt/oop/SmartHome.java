@@ -18,8 +18,9 @@ public class SmartHome implements Actionable{
 
     @Override
     public boolean execute(Function<Actionable, Boolean> action) {
-        action.apply(this);
-        return rooms.stream().map(s -> s.execute(action)).reduce((x, y) -> x || y).get();
+        boolean resultItSelf = action.apply(this);
+        boolean resultRooms = rooms.stream().map(s -> s.execute(action)).reduce((x, y) -> x || y).get();
+        return resultItSelf || resultRooms;
     }
 
 }
