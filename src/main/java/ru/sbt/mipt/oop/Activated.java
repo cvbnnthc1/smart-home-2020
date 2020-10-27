@@ -27,6 +27,9 @@ public class Activated extends SignalizationState {
         } else if(event.getType() == SensorEventType.ALARM_CANCELING) {
             System.out.println("Signalization is not in Alarm state, queerly...");
             alarm();
+        } else {
+            System.out.println("Event when signalization activated");
+            alarm();
         }
     }
 }
