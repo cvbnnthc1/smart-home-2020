@@ -1,5 +1,7 @@
 package ru.sbt.mipt.oop;
 
+import java.util.function.Function;
+
 import static ru.sbt.mipt.oop.SensorEventType.DOOR_CLOSED;
 import static ru.sbt.mipt.oop.SensorEventType.DOOR_OPEN;
 
@@ -11,28 +13,32 @@ public class DoorEventProcessor implements EventProcessor {
         this.smartHome = smartHome;
     }
 
-    private void doorOpen(Door door, Room room) {
-        door.setOpen(true);
-        System.out.println("Door " + door.getId() + " in room " + room.getName() + " was opened.");
-    }
-
-    private void doorCLose(Door door, Room room) {
-        door.setOpen(false);
-        System.out.println("Door " + door.getId() + " in room " + room.getName() + " was closed.");
-    }
-
     @Override
     public void processEvent(SensorEvent event) {
-        if (event.getType() == DOOR_OPEN || event.getType() == DOOR_CLOSED) {
-            Room room = smartHome.getRoomByDoor(event.getObjectId());
-            if (room != null) {
-                Door door = room.getDoor(event.getObjectId());
-                if (event.getType() == DOOR_OPEN) {
-                    doorOpen(door, room);
-                } else {
-                    doorCLose(door, room);
+        if (event.getType() == DOOR_OPEN) {
+            smartHome.execute(s -> {
+                if (s instanceof Door) {
+                    Door door = (Door) s;
+                    if (door.getId().equals(event.getObjectId())) {
+                        door.setOpen(true);
+                        System.out.println("Door " + door.getId() + " was opened.");
+                        return true;
+                    }
                 }
-            }
+                return false;
+            });
+        } else if (event.getType() == DOOR_CLOSED) {
+            smartHome.execute(s -> {
+                if (s instanceof Door) {
+                    Door door = (Door) s;
+                    if (door.getId().equals(event.getObjectId())) {
+                        door.setOpen(false);
+                        System.out.println("Door " + door.getId() + " was closed.");
+                        return true;
+                    }
+                }
+                return false;
+            });
         }
     }
 }

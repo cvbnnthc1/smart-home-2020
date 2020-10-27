@@ -3,9 +3,10 @@ package ru.sbt.mipt.oop;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.function.Function;
 
-public class SmartHome {
-    Collection<Room> rooms;
+public class SmartHome implements Actionable{
+    private final Collection<Room> rooms;
 
     public SmartHome() {
         rooms = new ArrayList<>();
@@ -15,38 +16,10 @@ public class SmartHome {
         this.rooms = rooms;
     }
 
-    public void addRoom(Room room) {
-        rooms.add(room);
+    @Override
+    public boolean execute(Function<Actionable, Boolean> action) {
+        action.apply(this);
+        return rooms.stream().map(s -> s.execute(action)).reduce((x, y) -> x || y).get();
     }
 
-    public Collection<Room> getRooms() {
-        return rooms;
-    }
-
-    public Room getRoom(String name) {
-        for (Room room : rooms) {
-            if (room.getName().equals(name)) return room;
-        }
-        return null;
-    }
-
-    public Room getRoomByDoor(String id) {
-        for (Room room : rooms) {
-            Door curDoor = room.getDoor(id);
-            if (curDoor != null) {
-                return room;
-            }
-        }
-        return null;
-    }
-
-    public Room getRoomByLight(String id) {
-        for (Room room : rooms) {
-            Light curLight = room.getLight(id);
-            if (curLight != null) {
-                return room;
-            }
-        }
-        return null;
-    }
 }

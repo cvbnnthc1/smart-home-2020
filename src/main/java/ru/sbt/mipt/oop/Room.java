@@ -1,11 +1,12 @@
 package ru.sbt.mipt.oop;
 
 import java.util.Collection;
+import java.util.function.Function;
 
-public class Room {
-    private Collection<Light> lights;
-    private Collection<Door> doors;
-    private String name;
+public class Room implements Actionable{
+    private final Collection<Light> lights;
+    private final Collection<Door> doors;
+    private final String name;
 
     public Room(Collection<Light> lights, Collection<Door> doors, String name) {
         this.lights = lights;
@@ -13,33 +14,18 @@ public class Room {
         this.name = name;
     }
 
-    public Collection<Light> getLights() {
-        return lights;
-    }
-
-    public Collection<Door> getDoors() {
-        return doors;
-    }
-
     public String getName() {
         return name;
     }
 
-    public Light getLight(String id) {
-        for (Light light : lights) {
-            if (light.getId().equals(id)) {
-                return light;
-            }
-        }
-        return null;
+    @Override
+    public boolean execute(Function<Actionable, Boolean> action) {
+        action.apply(this);
+        Boolean resultLights;
+        Boolean resultDoors;
+        resultLights = lights.stream().map(s -> s.execute(action)).reduce((x, y) -> x || y).get();
+        resultDoors = doors.stream().map(s -> s.execute(action)).reduce((x, y) -> x || y).get();
+        return resultLights || resultDoors;
     }
 
-    public Door getDoor(String id) {
-        for (Door door : doors) {
-            if (door.getId().equals(id)) {
-                return door;
-            }
-        }
-        return null;
-    }
 }

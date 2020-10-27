@@ -11,28 +11,32 @@ public class LightEventProcessor implements EventProcessor {
         this.smartHome = smartHome;
     }
 
-    private void lightOn(Light light, Room room) {
-        light.setOn(true);
-        System.out.println("Light " + light.getId() + " in room " + room.getName() + " was turned on.");
-    }
-
-    public void lightOff(Light light, Room room) {
-        light.setOn(false);
-        System.out.println("Light " + light.getId() + " in room " + room.getName() + " was turned off.");
-    }
-
     @Override
     public void processEvent(SensorEvent event) {
-        if (event.getType() == LIGHT_ON || event.getType() == LIGHT_OFF) {
-            Room room = smartHome.getRoomByLight(event.getObjectId());
-            if (room != null) {
-                Light light = room.getLight(event.getObjectId());
-                if (event.getType() == LIGHT_ON) {
-                    lightOn(light, room);
-                } else {
-                    lightOff(light, room);
+        if (event.getType() == LIGHT_ON) {
+            smartHome.execute(s -> {
+                if (s instanceof Light) {
+                    Light light = (Light) s;
+                    if (light.getId().equals(event.getObjectId())) {
+                        light.setOn(true);
+                        System.out.println("Light " + light.getId() + " was on.");
+                        return true;
+                    }
                 }
-            }
+                return false;
+            });
+        } else if (event.getType() == LIGHT_OFF) {
+            smartHome.execute(s -> {
+                if (s instanceof Light) {
+                    Light light = (Light) s;
+                    if (light.getId().equals(event.getObjectId())) {
+                        light.setOn(false);
+                        System.out.println("Light " + light.getId() + " was off.");
+                        return true;
+                    }
+                }
+                return false;
+            });
         }
     }
 }

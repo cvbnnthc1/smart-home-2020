@@ -21,5 +21,4 @@ public class Application {
         processor.executeScript(smartHome, sensorEventProvider);
     }
 
-
 }
