@@ -2,10 +2,12 @@ package ru.sbt.mipt.oop;
 
 public class HallDoorEventHandler implements EventHandler {
     private final SmartHome smartHome;
+    private final CommandSender commandSender;
 
-    HallDoorEventHandler(SmartHome smartHome) {
-        if (smartHome == null) throw new IllegalArgumentException("Null input");
+    HallDoorEventHandler(SmartHome smartHome, CommandSender commandSender) {
+        if (smartHome == null || commandSender == null) throw new IllegalArgumentException("Null input");
         this.smartHome = smartHome;
+        this.commandSender = commandSender;
     }
 
     @Override

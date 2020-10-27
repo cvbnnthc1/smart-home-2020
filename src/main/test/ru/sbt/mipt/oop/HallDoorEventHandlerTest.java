@@ -14,6 +14,7 @@ public class HallDoorEventHandlerTest {
     SmartHome smartHome;
     Map<String, List<Door>> doorsByRoom = new HashMap<>();
     Map<String, List<Light>> lightsByRoom = new HashMap<>();
+    CommandSender commandSender;
 
     @Before
     public void readHome() {
@@ -35,13 +36,14 @@ public class HallDoorEventHandlerTest {
         Room hall = new Room(lightsByRoom.get("hall"),
                 doorsByRoom.get("hall"), "hall");
         SmartHome smartHome = new SmartHome(Arrays.asList(kitchen, bathroom, bedroom, hall));
+        commandSender = new CommandSenderImpl();
         this.smartHome = smartHome;
     }
 
     @Test
     public void processEvent_offAllLights() {
         //given
-        HallDoorEventHandler hallDoorEventProcessor = new HallDoorEventHandler(smartHome);
+        HallDoorEventHandler hallDoorEventProcessor = new HallDoorEventHandler(smartHome, commandSender);
         //when
         hallDoorEventProcessor.processEvent(new SensorEvent(SensorEventType.DOOR_CLOSED, "4"));
         //then
@@ -55,7 +57,7 @@ public class HallDoorEventHandlerTest {
     @Test
     public void processEvent_offAllLightsAfterOnAllLights() {
         //given
-        HallDoorEventHandler hallDoorEventProcessor = new HallDoorEventHandler(smartHome);
+        HallDoorEventHandler hallDoorEventProcessor = new HallDoorEventHandler(smartHome, commandSender);
         //when
         for (int i = 1; i < 10; i++) {
             new LightEventHandler(smartHome).processEvent(new SensorEvent(SensorEventType.LIGHT_ON, "" + i));

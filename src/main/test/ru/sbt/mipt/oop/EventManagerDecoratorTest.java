@@ -36,9 +36,10 @@ public class EventManagerDecoratorTest {
         SmartHome smartHome = new SmartHome(Arrays.asList(kitchen, bathroom, bedroom, hall));
         this.smartHome = smartHome;
         signalization = new Signalization();
+        CommandSender commandSender = new CommandSenderImpl();
         processors.add(new EventHandlerDecorator(new DoorEventHandler(smartHome), signalization));
         processors.add(new EventHandlerDecorator(new LightEventHandler(smartHome), signalization));
-        processors.add(new EventHandlerDecorator(new HallDoorEventHandler(smartHome), signalization));
+        processors.add(new EventHandlerDecorator(new HallDoorEventHandler(smartHome, commandSender), signalization));
         processors.add(new EventHandlerDecorator(new SignalizationEventHandler(signalization), signalization));
     }
 

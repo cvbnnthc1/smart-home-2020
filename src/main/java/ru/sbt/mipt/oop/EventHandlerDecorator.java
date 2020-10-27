@@ -20,4 +20,8 @@ public class EventHandlerDecorator implements EventHandler {
             eventHandler.processEvent(event);
         }
     }
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> hometask-3

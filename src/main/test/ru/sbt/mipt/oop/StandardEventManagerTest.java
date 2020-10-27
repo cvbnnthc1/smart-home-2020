@@ -1,3 +1,4 @@
+
 package ru.sbt.mipt.oop;
 
 import org.junit.Before;
@@ -34,9 +35,10 @@ public class StandardEventManagerTest {
                 doorsByRoom.get("hall"), "hall");
         SmartHome smartHome = new SmartHome(Arrays.asList(kitchen, bathroom, bedroom, hall));
         this.smartHome = smartHome;
+        CommandSender commandSender = new CommandSenderImpl();
         processors.add(new DoorEventHandler(smartHome));
         processors.add(new LightEventHandler(smartHome));
-        processors.add(new HallDoorEventHandler(smartHome));
+        processors.add(new HallDoorEventHandler(smartHome, commandSender));
     }
 
     @Test
