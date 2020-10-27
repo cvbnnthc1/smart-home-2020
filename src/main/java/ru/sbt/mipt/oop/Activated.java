@@ -8,7 +8,25 @@ public class Activated extends SignalizationState {
         this.code = code;
     }
 
-    boolean checkCode(int code) {
+    private boolean checkCode(int code) {
         return this.code == code;
+    }
+
+    @Override
+    public void handleEvent(SensorEvent event) {
+        if (event.getType() == SensorEventType.ALARM_DEACTIVATE) {
+            if (checkCode(event.getCode())) {
+                deactivate();
+            } else {
+                System.out.println("Wrong deactivation code");
+                alarm();
+            }
+        } else if(event.getType() == SensorEventType.ALARM_ACTIVATE) {
+            System.out.println("Already activated");
+            alarm();
+        } else if(event.getType() == SensorEventType.ALARM_CANCELING) {
+            System.out.println("Signalization is not in Alarm state, queerly...");
+            alarm();
+        }
     }
 }

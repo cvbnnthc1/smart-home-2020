@@ -7,11 +7,12 @@ import java.util.*;
 
 import static org.junit.Assert.*;
 
-public class ProcessingScriptDecoratorTest {
+public class EventManagerDecoratorTest {
     SmartHome smartHome;
     Map<String, List<Door>> doorsByRoom = new HashMap<>();
     Map<String, List<Light>> lightsByRoom = new HashMap<>();
-    List<EventProcessor> processors = new ArrayList<>();
+    List<EventHandler> processors = new ArrayList<>();
+    Signalization signalization;
 
     @Before
     public void readHome() {
@@ -34,9 +35,12 @@ public class ProcessingScriptDecoratorTest {
                 doorsByRoom.get("hall"), "hall");
         SmartHome smartHome = new SmartHome(Arrays.asList(kitchen, bathroom, bedroom, hall));
         this.smartHome = smartHome;
-        processors.add(new DoorEventProcessor(smartHome));
-        processors.add(new LightEventProcessor(smartHome));
-        processors.add(new HallDoorEventProcessor(smartHome));
+        signalization = new Signalization();
+        CommandSender commandSender = new CommandSenderImpl();
+        processors.add(new EventHandlerDecorator(new DoorEventHandler(smartHome), signalization));
+        processors.add(new EventHandlerDecorator(new LightEventHandler(smartHome), signalization));
+        processors.add(new EventHandlerDecorator(new HallDoorEventHandler(smartHome, commandSender), signalization));
+        processors.add(new EventHandlerDecorator(new SignalizationEventHandler(signalization), signalization));
     }
 
     @Test
@@ -45,11 +49,11 @@ public class ProcessingScriptDecoratorTest {
         ArrayList<SensorEvent> events = new ArrayList<>();
         events.add(new SensorEvent(SensorEventType.DOOR_CLOSED, "4"));
         //when
-        Signalization signalization = new Signalization();
         signalization.setState(new Activated(signalization,3));
-        processors.add(new SignalizationEventProcessor(signalization));
-        ProcessingScript standardProcessingScript = new ProcessingScriptDecorator(new StandardProcessingScript(processors), signalization);
-        for (SensorEvent event: events) standardProcessingScript.processEvent(event);
+        processors.add(new SignalizationEventHandler(signalization));
+        MockSensorEventProvider sensor = new MockSensorEventProvider(events.iterator());
+        StandardEventManager standardEventManager = new StandardEventManager(processors, sensor);
+        standardEventManager.start();
         //then
         for (String room: lightsByRoom.keySet()) {
             for (Light light: lightsByRoom.get(room)) {
@@ -65,11 +69,10 @@ public class ProcessingScriptDecoratorTest {
         events.add(new SensorEvent(SensorEventType.ALARM_DEACTIVATE, "123", 13));
         events.add(new SensorEvent(SensorEventType.DOOR_CLOSED, "4"));
         //when
-        Signalization signalization = new Signalization();
         signalization.setState(new Activated(signalization,123));
-        processors.add(new SignalizationEventProcessor(signalization));
-        ProcessingScript standardProcessingScript = new ProcessingScriptDecorator(new StandardProcessingScript(processors), signalization);
-        for (SensorEvent event: events) standardProcessingScript.processEvent(event);
+        MockSensorEventProvider sensor = new MockSensorEventProvider(events.iterator());
+        StandardEventManager standardEventManager = new StandardEventManager(processors, sensor);
+        standardEventManager.start();
         //then
         boolean result = false;
         for (String room: lightsByRoom.keySet()) {
@@ -87,11 +90,10 @@ public class ProcessingScriptDecoratorTest {
         events.add(new SensorEvent(SensorEventType.ALARM_DEACTIVATE, "1", 123));
         events.add(new SensorEvent(SensorEventType.DOOR_OPEN, "1"));
         //when
-        Signalization signalization = new Signalization();
         signalization.setState(new Activated(signalization,123));
-        processors.add(new SignalizationEventProcessor(signalization));
-        ProcessingScript standardProcessingScript = new ProcessingScriptDecorator(new StandardProcessingScript(processors), signalization);
-        for (SensorEvent event: events) standardProcessingScript.processEvent(event);
+        MockSensorEventProvider sensor = new MockSensorEventProvider(events.iterator());
+        StandardEventManager standardEventManager = new StandardEventManager(processors, sensor);
+        standardEventManager.start();
         Door result = doorsByRoom.get("kitchen").get(0);
         //then
         assertEquals("1", result.getId());
@@ -104,11 +106,10 @@ public class ProcessingScriptDecoratorTest {
         ArrayList<SensorEvent> events = new ArrayList<>();
         events.add(new SensorEvent(SensorEventType.DOOR_OPEN, "1"));
         //when
-        Signalization signalization = new Signalization();
         signalization.setState(new Alarm(signalization));
-        processors.add(new SignalizationEventProcessor(signalization));
-        ProcessingScript standardProcessingScript = new ProcessingScriptDecorator(new StandardProcessingScript(processors), signalization);
-        for (SensorEvent event: events) standardProcessingScript.processEvent(event);
+        MockSensorEventProvider sensor = new MockSensorEventProvider(events.iterator());
+        StandardEventManager standardEventManager = new StandardEventManager(processors, sensor);
+        standardEventManager.start();
         Door result = doorsByRoom.get("kitchen").get(0);
         //then
         assertEquals("1", result.getId());
@@ -122,14 +123,29 @@ public class ProcessingScriptDecoratorTest {
         events.add(new SensorEvent(SensorEventType.ALARM_CANCELING, "1", 123));
         events.add(new SensorEvent(SensorEventType.DOOR_OPEN, "1"));
         //when
-        Signalization signalization = new Signalization();
         signalization.setState(new Alarm(signalization));
-        processors.add(new SignalizationEventProcessor(signalization));
-        ProcessingScript standardProcessingScript = new ProcessingScriptDecorator(new StandardProcessingScript(processors), signalization);
-        for (SensorEvent event: events) standardProcessingScript.processEvent(event);
+        MockSensorEventProvider sensor = new MockSensorEventProvider(events.iterator());
+        StandardEventManager standardEventManager = new StandardEventManager(processors, sensor);
+        standardEventManager.start();
         Door result = doorsByRoom.get("kitchen").get(0);
         //then
         assertEquals("1", result.getId());
         assertTrue(result.isOpen());
+    }
+
+    private static class MockSensorEventProvider implements SensorEventProvider {
+        Iterator<SensorEvent> iterator;
+        MockSensorEventProvider(Iterator<SensorEvent> iterator) {
+            this.iterator = iterator;
+        }
+
+        @Override
+        public SensorEvent getNextSensorEvent() {
+            if (iterator.hasNext()) {
+                return iterator.next();
+            } else {
+                return null;
+            }
+        }
     }
 }

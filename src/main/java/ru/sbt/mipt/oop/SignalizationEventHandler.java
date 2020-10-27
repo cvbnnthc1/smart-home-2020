@@ -1,9 +1,9 @@
 package ru.sbt.mipt.oop;
 
-public class SignalizationEventProcessor implements EventProcessor {
+public class SignalizationEventHandler implements EventHandler {
     public final Signalization signalization;
 
-    SignalizationEventProcessor(Signalization signalization) {
+    SignalizationEventHandler(Signalization signalization) {
         if (signalization == null) throw new IllegalArgumentException("Null input");
         this.signalization = signalization;
     }
