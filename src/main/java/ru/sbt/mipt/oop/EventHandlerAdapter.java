@@ -4,12 +4,12 @@ import com.coolcompany.smarthome.events.CCSensorEvent;
 
 import java.util.Map;
 
-public class EventProcessorAdapter implements com.coolcompany.smarthome.events.EventHandler {
+public class EventHandlerAdapter implements com.coolcompany.smarthome.events.EventHandler {
     private final EventHandler eventHandler;
     private final Map<String, SensorEventType> mapOfEvents;
     private final int code;
 
-    public EventProcessorAdapter(EventHandler eventHandler, Map<String, SensorEventType> mapOfEvents, int code) {
+    public EventHandlerAdapter(EventHandler eventHandler, Map<String, SensorEventType> mapOfEvents, int code) {
         this.eventHandler = eventHandler;
         this.mapOfEvents = mapOfEvents;
         this.code = code;

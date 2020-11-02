@@ -2,14 +2,16 @@ package ru.sbt.mipt.oop;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import java.util.Arrays;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Configuration
 public class EventManagerConfiguration {
 
     @Bean
     EventManager eventManager() {
-        return new StandardEventManager(Arrays.asList(eventHandlers()), sensorEventProvider());
+        return new StandardEventManager(handlerList(), new RandomSensorEventProvider());
     }
 
     @Bean
@@ -21,7 +23,7 @@ public class EventManagerConfiguration {
 
     @Bean
     SmartHome smartHome() {
-        return smartHomeReader().readSmartHome(source());
+        return smartHomeReader().readSmartHome("smart-home-1.js");
     }
 
     @Bean
@@ -29,10 +31,6 @@ public class EventManagerConfiguration {
         return new SmartHomeJSONReader();
     }
 
-    @Bean
-    String source() {
-        return "smart-home-1.js";
-    }
 
     @Bean
     EventHandler doorEventHandler() {
@@ -46,7 +44,7 @@ public class EventManagerConfiguration {
 
     @Bean
     EventHandler hallDoorEventHandler() {
-        return new EventHandlerDecorator(new HallDoorEventHandler(smartHome(), commandSender()), signalization());
+        return new EventHandlerDecorator(new HallDoorEventHandler(smartHome(), new CommandSenderImpl()), signalization());
     }
 
     @Bean
@@ -54,21 +52,14 @@ public class EventManagerConfiguration {
         return new EventHandlerDecorator(new SignalizationEventHandler(signalization()), signalization());
     }
 
-    @Bean SensorEventProvider sensorEventProvider() {
-        return new RandomSensorEventProvider();
-    }
-
     @Bean
-    EventHandler[] eventHandlers() {
-        return new EventHandler[]{doorEventHandler(),
-                lightEventHandler(),
-                hallDoorEventHandler(),
-                signalizationEventHandler()};
-    }
-
-    @Bean
-    CommandSender commandSender() {
-        return new CommandSenderImpl();
-    }
+    List<EventHandler> handlerList() {
+        List<EventHandler> handlerList = new ArrayList<>();
+        handlerList.add(doorEventHandler());
+        handlerList.add(lightEventHandler());
+        handlerList.add(hallDoorEventHandler());
+        handlerList.add(signalizationEventHandler());
+        return handlerList;
+    };
 
 }
