@@ -11,7 +11,6 @@ public class Application {
         AbstractApplicationContext context = new AnnotationConfigApplicationContext(EventManagerConfiguration.class);
         StandardEventManager eventManager = context.getBean(StandardEventManager.class);
         eventManager.start();
-
     }
 
 }

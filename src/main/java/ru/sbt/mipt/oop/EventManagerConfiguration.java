@@ -2,16 +2,14 @@ package ru.sbt.mipt.oop;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Collection;
 
 @Configuration
 public class EventManagerConfiguration {
 
     @Bean
-    EventManager eventManager() {
-        return new StandardEventManager(handlerList(), new RandomSensorEventProvider());
+    EventManager eventManager(Collection<EventHandler> handlers) {
+        return new StandardEventManager(handlers, new RandomSensorEventProvider());
     }
 
     @Bean
@@ -52,14 +50,5 @@ public class EventManagerConfiguration {
         return new EventHandlerDecorator(new SignalizationEventHandler(signalization()), signalization());
     }
 
-    @Bean
-    List<EventHandler> handlerList() {
-        List<EventHandler> handlerList = new ArrayList<>();
-        handlerList.add(doorEventHandler());
-        handlerList.add(lightEventHandler());
-        handlerList.add(hallDoorEventHandler());
-        handlerList.add(signalizationEventHandler());
-        return handlerList;
-    };
 
 }

@@ -3,18 +3,14 @@ package ru.sbt.mipt.oop;
 import com.coolcompany.smarthome.events.SensorEventsManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Configuration
 public class LibraryEventManagerConfiguration {
     @Bean
-    SensorEventsManager sensorEventsManager() {
+    SensorEventsManager sensorEventsManager(Collection<EventHandlerAdapter> handlerAdapters) {
         SensorEventsManager result = new SensorEventsManager();
-        for (EventHandlerAdapter handler: handlerList()) {
+        for (EventHandlerAdapter handler: handlerAdapters) {
             result.registerEventHandler(handler);
         }
         return result;
@@ -73,13 +69,4 @@ public class LibraryEventManagerConfiguration {
                     eventTypeMap(),123);
     }
 
-    @Bean
-    List<EventHandlerAdapter> handlerList() {
-        List<EventHandlerAdapter> handlerList = new ArrayList<>();
-        handlerList.add(doorEventHandlerAdapter());
-        handlerList.add(lightEventHandlerAdapter());
-        handlerList.add(hallDoorEventHandlerAdapter());
-        handlerList.add(signalizationEventHandlerAdapter());
-        return handlerList;
-    };
 }
