@@ -47,26 +47,31 @@ public class LibraryEventManagerConfiguration {
 
     @Bean
     EventHandlerAdapter doorEventHandlerAdapter() {
-        return new EventHandlerAdapter(new EventHandlerDecorator(new DoorEventHandler(smartHome()), signalization()),
+        return new EventHandlerAdapter(new EventHandlerDecorator(new DoorEventHandler(smartHome(), commandSender()), signalization()),
                     eventTypeMap(),123);
     }
 
     @Bean
     EventHandlerAdapter lightEventHandlerAdapter() {
-        return new EventHandlerAdapter(new EventHandlerDecorator(new LightEventHandler(smartHome()), signalization()),
+        return new EventHandlerAdapter(new EventHandlerDecorator(new LightEventHandler(smartHome(), commandSender()), signalization()),
                     eventTypeMap(),123);
     }
 
     @Bean
     EventHandlerAdapter hallDoorEventHandlerAdapter() {
-        return new EventHandlerAdapter(new EventHandlerDecorator(new HallDoorEventHandler(smartHome(), new CommandSenderImpl()), signalization()),
+        return new EventHandlerAdapter(new EventHandlerDecorator(new HallDoorEventHandler(smartHome(), commandSender()), signalization()),
                     eventTypeMap(),123);
     }
 
     @Bean
     EventHandlerAdapter signalizationEventHandlerAdapter() {
-        return new EventHandlerAdapter(new EventHandlerDecorator(new SignalizationEventHandler(signalization()), signalization()),
+        return new EventHandlerAdapter(new EventHandlerDecorator(new SignalizationEventHandler(signalization(), commandSender()), signalization()),
                     eventTypeMap(),123);
+    }
+
+    @Bean
+    CommandSender commandSender() {
+        return new CommandSenderImpl();
     }
 
 }

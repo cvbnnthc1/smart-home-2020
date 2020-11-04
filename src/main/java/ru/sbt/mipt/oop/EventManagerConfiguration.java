@@ -32,22 +32,27 @@ public class EventManagerConfiguration {
 
     @Bean
     EventHandler doorEventHandler() {
-        return new EventHandlerDecorator(new DoorEventHandler(smartHome()), signalization());
+        return new EventHandlerDecorator(new DoorEventHandler(smartHome(), commandSender()), signalization());
     }
 
     @Bean
     EventHandler lightEventHandler() {
-        return new EventHandlerDecorator(new LightEventHandler(smartHome()), signalization());
+        return new EventHandlerDecorator(new LightEventHandler(smartHome(), commandSender()), signalization());
     }
 
     @Bean
     EventHandler hallDoorEventHandler() {
-        return new EventHandlerDecorator(new HallDoorEventHandler(smartHome(), new CommandSenderImpl()), signalization());
+        return new EventHandlerDecorator(new HallDoorEventHandler(smartHome(), commandSender()), signalization());
     }
 
     @Bean
     EventHandler signalizationEventHandler() {
-        return new EventHandlerDecorator(new SignalizationEventHandler(signalization()), signalization());
+        return new EventHandlerDecorator(new SignalizationEventHandler(signalization(), commandSender()), signalization());
+    }
+
+    @Bean
+    CommandSender commandSender() {
+        return new CommandSenderImpl();
     }
 
 

@@ -13,34 +13,35 @@ public class EventManagerDecoratorTest {
     Map<String, List<Light>> lightsByRoom = new HashMap<>();
     List<EventHandler> processors = new ArrayList<>();
     Signalization signalization;
+    CommandSender commandSender = new CommandSenderImpl();
 
     @Before
     public void readHome() {
         doorsByRoom = new HashMap<>();
         lightsByRoom = new HashMap<>();
         doorsByRoom.put("kitchen",  Arrays.asList(new Door(false, "1", "kitchen")));
-        lightsByRoom.put("kitchen",  Arrays.asList(new Light("1", false), new Light("2", true)));
+        lightsByRoom.put("kitchen",  Arrays.asList(new Light("1", false, "kitchen"), new Light("2", true, "kitchen")));
         Room kitchen = new Room(lightsByRoom.get("kitchen"),
                 doorsByRoom.get("kitchen"),"kitchen");
         doorsByRoom.put("bathroom",  Arrays.asList(new Door(false, "2", "bathroom")));
-        lightsByRoom.put("bathroom",  Arrays.asList(new Light("3", true)));
+        lightsByRoom.put("bathroom",  Arrays.asList(new Light("3", true, "bathroom")));
         Room bathroom = new Room(lightsByRoom.get("bathroom"),
                 doorsByRoom.get("bathroom"), "bathroom");
         doorsByRoom.put("bedroom",  Arrays.asList(new Door(true, "3", "bedroom")));
-        lightsByRoom.put("bedroom",  Arrays.asList(new Light("4", false), new Light("5", false), new Light("6", false)));
+        lightsByRoom.put("bedroom",  Arrays.asList(new Light("4", false, "bedroom"), new Light("5", false, "bedroom"), new Light("6", false, "bedroom")));
         Room bedroom = new Room(lightsByRoom.get("bedroom"), doorsByRoom.get("bedroom"), "bedroom");
         doorsByRoom.put("hall",  Arrays.asList(new Door(false, "4", "hall")));
-        lightsByRoom.put("hall",  Arrays.asList(new Light("7", false), new Light("8", false), new Light("9", false)));
+        lightsByRoom.put("hall",  Arrays.asList(new Light("7", false, "hall"), new Light("8", false, "hall"), new Light("9", false, "hall")));
         Room hall = new Room(lightsByRoom.get("hall"),
                 doorsByRoom.get("hall"), "hall");
         SmartHome smartHome = new SmartHome(Arrays.asList(kitchen, bathroom, bedroom, hall));
         this.smartHome = smartHome;
         signalization = new Signalization();
         CommandSender commandSender = new CommandSenderImpl();
-        processors.add(new EventHandlerDecorator(new DoorEventHandler(smartHome), signalization));
-        processors.add(new EventHandlerDecorator(new LightEventHandler(smartHome), signalization));
+        processors.add(new EventHandlerDecorator(new DoorEventHandler(smartHome, commandSender), signalization));
+        processors.add(new EventHandlerDecorator(new LightEventHandler(smartHome, commandSender), signalization));
         processors.add(new EventHandlerDecorator(new HallDoorEventHandler(smartHome, commandSender), signalization));
-        processors.add(new EventHandlerDecorator(new SignalizationEventHandler(signalization), signalization));
+        processors.add(new EventHandlerDecorator(new SignalizationEventHandler(signalization, commandSender), signalization));
     }
 
     @Test
@@ -50,7 +51,7 @@ public class EventManagerDecoratorTest {
         events.add(new SensorEvent(SensorEventType.DOOR_CLOSED, "4"));
         //when
         signalization.setState(new Activated(signalization,3));
-        processors.add(new SignalizationEventHandler(signalization));
+        processors.add(new SignalizationEventHandler(signalization, commandSender));
         MockSensorEventProvider sensor = new MockSensorEventProvider(events.iterator());
         StandardEventManager standardEventManager = new StandardEventManager(processors, sensor);
         standardEventManager.start();
