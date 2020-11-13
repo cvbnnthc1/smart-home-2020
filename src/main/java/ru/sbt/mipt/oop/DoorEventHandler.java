@@ -1,14 +1,13 @@
 package ru.sbt.mipt.oop;
 
-import java.util.function.Function;
+import static ru.sbt.mipt.oop.SensorEventType.*;
 
-import static ru.sbt.mipt.oop.SensorEventType.DOOR_CLOSED;
-import static ru.sbt.mipt.oop.SensorEventType.DOOR_OPEN;
-
-public class DoorEventProcessor implements EventProcessor {
+public class DoorEventHandler implements EventHandler {
     private final SmartHome smartHome;
+    private final CommandSender commandSender;
 
-    DoorEventProcessor(SmartHome smartHome) {
+    DoorEventHandler(SmartHome smartHome, CommandSender commandSender) {
+        this.commandSender = commandSender;
         if (smartHome == null) throw new IllegalArgumentException("Null input");
         this.smartHome = smartHome;
     }
@@ -34,6 +33,19 @@ public class DoorEventProcessor implements EventProcessor {
                     if (door.getId().equals(event.getObjectId())) {
                         door.setOpen(false);
                         System.out.println("Door " + door.getId() + " was closed.");
+                        return true;
+                    }
+                }
+                return false;
+            });
+        } else if (event.getType() == CLOSE_FRONT_DOOR) {
+            smartHome.execute(s -> {
+                if (s instanceof Door) {
+                    Door door = (Door) s;
+                    if (door.getRoomName().equals("hall")) {
+                        door.setOpen(false);
+                        SensorCommand command = new SensorCommand(CommandType.CLOSE_DOOR, door.getId());
+                        commandSender.sendCommand(command);
                         return true;
                     }
                 }

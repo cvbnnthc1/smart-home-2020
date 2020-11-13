@@ -1,3 +1,4 @@
+
 package ru.sbt.mipt.oop;
 
 import org.junit.Before;
@@ -7,48 +8,49 @@ import java.util.*;
 
 import static org.junit.Assert.*;
 
-public class StandardProcessingScriptTest {
+public class StandardEventManagerTest {
     SmartHome smartHome;
     Map<String, List<Door>> doorsByRoom = new HashMap<>();
     Map<String, List<Light>> lightsByRoom = new HashMap<>();
+    List<EventHandler> processors = new ArrayList<>();
 
     @Before
     public void readHome() {
         doorsByRoom = new HashMap<>();
         lightsByRoom = new HashMap<>();
         doorsByRoom.put("kitchen",  Arrays.asList(new Door(false, "1", "kitchen")));
-        lightsByRoom.put("kitchen",  Arrays.asList(new Light("1", false), new Light("2", true)));
+        lightsByRoom.put("kitchen",  Arrays.asList(new Light("1", false, "kitchen"), new Light("2", true, "kitchen")));
         Room kitchen = new Room(lightsByRoom.get("kitchen"),
                 doorsByRoom.get("kitchen"),"kitchen");
         doorsByRoom.put("bathroom",  Arrays.asList(new Door(false, "2", "bathroom")));
-        lightsByRoom.put("bathroom",  Arrays.asList(new Light("3", true)));
+        lightsByRoom.put("bathroom",  Arrays.asList(new Light("3", true, "bathroom")));
         Room bathroom = new Room(lightsByRoom.get("bathroom"),
                 doorsByRoom.get("bathroom"), "bathroom");
         doorsByRoom.put("bedroom",  Arrays.asList(new Door(true, "3", "bedroom")));
-        lightsByRoom.put("bedroom",  Arrays.asList(new Light("4", false), new Light("5", false), new Light("6", false)));
+        lightsByRoom.put("bedroom",  Arrays.asList(new Light("4", false, "bedroom"), new Light("5", false, "bedroom"), new Light("6", false, "bedroom")));
         Room bedroom = new Room(lightsByRoom.get("bedroom"), doorsByRoom.get("bedroom"), "bedroom");
         doorsByRoom.put("hall",  Arrays.asList(new Door(false, "4", "hall")));
-        lightsByRoom.put("hall",  Arrays.asList(new Light("7", false), new Light("8", false), new Light("9", false)));
+        lightsByRoom.put("hall",  Arrays.asList(new Light("7", false, "hall"), new Light("8", false, "hall"), new Light("9", false, "hall")));
         Room hall = new Room(lightsByRoom.get("hall"),
                 doorsByRoom.get("hall"), "hall");
         SmartHome smartHome = new SmartHome(Arrays.asList(kitchen, bathroom, bedroom, hall));
-        this.smartHome = smartHome;
+        CommandSender commandSender = new CommandSenderImpl();
+        processors.add(new DoorEventHandler(smartHome, commandSender));
+        processors.add(new LightEventHandler(smartHome, commandSender));
+        processors.add(new HallDoorEventHandler(smartHome, commandSender));
     }
 
     @Test
-    public void doScript_offAllLightsAfterCloseEntranceDoor() {
+    public void processEvent_offAllLightsAfterCloseEntranceDoor() {
         //given
         ArrayList<SensorEvent> events = new ArrayList<>();
         events.add(new SensorEvent(SensorEventType.DOOR_CLOSED, "4"));
         //when
-        List<EventProcessor> processors = new ArrayList<>();
-        processors.add(new DoorEventProcessor(smartHome));
-        processors.add(new LightEventProcessor(smartHome));
-        processors.add(new HallDoorEventProcessor(smartHome));
-        ProcessingScript processor = new StandardProcessingScript(processors);
-        processor.executeScript(smartHome, new MockSensorEventProvider(events.iterator()));
+        MockSensorEventProvider sensor = new MockSensorEventProvider(events.iterator());
+        StandardEventManager standardEventManager = new StandardEventManager(processors, sensor);
+        standardEventManager.start();
         //then
-        for (String room: doorsByRoom.keySet()) {
+        for (String room: lightsByRoom.keySet()) {
             for (Light light: lightsByRoom.get(room)) {
                 assertFalse(light.isOn());
             }
@@ -56,16 +58,14 @@ public class StandardProcessingScriptTest {
     }
 
     @Test
-    public void doScript_closeFirstDoor() {
+    public void processEvent_closeFirstDoor() {
         //given
         ArrayList<SensorEvent> events = new ArrayList<>();
         events.add(new SensorEvent(SensorEventType.DOOR_CLOSED, "1"));
         //when
-        List<EventProcessor> processors = new ArrayList<>();
-        processors.add(new DoorEventProcessor(smartHome));
-        processors.add(new LightEventProcessor(smartHome));
-        processors.add(new HallDoorEventProcessor(smartHome));
-        ProcessingScript processor = new StandardProcessingScript(processors);
+        MockSensorEventProvider sensor = new MockSensorEventProvider(events.iterator());
+        StandardEventManager standardEventManager = new StandardEventManager(processors, sensor);
+        standardEventManager.start();
         Door result = doorsByRoom.get("kitchen").get(0);
         //then
         assertEquals("1", result.getId());
@@ -73,17 +73,14 @@ public class StandardProcessingScriptTest {
     }
 
     @Test
-    public void doScript_openFirstDoor() {
+    public void processEvent_openFirstDoor() {
         //given
         ArrayList<SensorEvent> events = new ArrayList<>();
         events.add(new SensorEvent(SensorEventType.DOOR_OPEN, "1"));
         //when
-        List<EventProcessor> processors = new ArrayList<>();
-        processors.add(new DoorEventProcessor(smartHome));
-        processors.add(new LightEventProcessor(smartHome));
-        processors.add(new HallDoorEventProcessor(smartHome));
-        ProcessingScript processor = new StandardProcessingScript(processors);
-        processor.executeScript(smartHome, new MockSensorEventProvider(events.iterator()));
+        MockSensorEventProvider sensor = new MockSensorEventProvider(events.iterator());
+        StandardEventManager standardEventManager = new StandardEventManager(processors, sensor);
+        standardEventManager.start();
         Door result = doorsByRoom.get("kitchen").get(0);
         //then
         assertEquals("1", result.getId());
@@ -91,17 +88,14 @@ public class StandardProcessingScriptTest {
     }
 
     @Test
-    public void doScript_offFirstDoor() {
+    public void processEvent_offFirstDoor() {
         //given
         ArrayList<SensorEvent> events = new ArrayList<>();
         events.add(new SensorEvent(SensorEventType.LIGHT_OFF, "1"));
         //when
-        List<EventProcessor> processors = new ArrayList<>();
-        processors.add(new DoorEventProcessor(smartHome));
-        processors.add(new LightEventProcessor(smartHome));
-        processors.add(new HallDoorEventProcessor(smartHome));
-        ProcessingScript processor = new StandardProcessingScript(processors);
-        processor.executeScript(smartHome, new MockSensorEventProvider(events.iterator()));
+        MockSensorEventProvider sensor = new MockSensorEventProvider(events.iterator());
+        StandardEventManager standardEventManager = new StandardEventManager(processors, sensor);
+        standardEventManager.start();
         Light result = lightsByRoom.get("kitchen").get(0);
         //then
         assertEquals("1", result.getId());
@@ -109,24 +103,21 @@ public class StandardProcessingScriptTest {
     }
 
     @Test
-    public void doScript_onFirstDoor() {
+    public void processEvent_onFirstDoor() {
         //given
         ArrayList<SensorEvent> events = new ArrayList<>();
         events.add(new SensorEvent(SensorEventType.LIGHT_ON, "1"));
         //when
-        List<EventProcessor> processors = new ArrayList<>();
-        processors.add(new DoorEventProcessor(smartHome));
-        processors.add(new LightEventProcessor(smartHome));
-        processors.add(new HallDoorEventProcessor(smartHome));
-        ProcessingScript processor = new StandardProcessingScript(processors);
-        processor.executeScript(smartHome, new MockSensorEventProvider(events.iterator()));
+        MockSensorEventProvider sensor = new MockSensorEventProvider(events.iterator());
+        StandardEventManager standardEventManager = new StandardEventManager(processors, sensor);
+        standardEventManager.start();
         Light result = lightsByRoom.get("kitchen").get(0);
         //then
         assertEquals("1", result.getId());
         assertTrue(result.isOn());
     }
 
-    class MockSensorEventProvider implements SensorEventProvider {
+    private static class MockSensorEventProvider implements SensorEventProvider {
         Iterator<SensorEvent> iterator;
         MockSensorEventProvider(Iterator<SensorEvent> iterator) {
             this.iterator = iterator;
@@ -141,6 +132,4 @@ public class StandardProcessingScriptTest {
             }
         }
     }
-
-
 }
