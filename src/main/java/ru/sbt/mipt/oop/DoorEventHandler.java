@@ -1,14 +1,12 @@
 package ru.sbt.mipt.oop;
 
-import java.util.function.Function;
-
 import static ru.sbt.mipt.oop.SensorEventType.DOOR_CLOSED;
 import static ru.sbt.mipt.oop.SensorEventType.DOOR_OPEN;
 
-public class DoorEventProcessor implements EventProcessor {
+public class DoorEventHandler implements EventHandler {
     private final SmartHome smartHome;
 
-    DoorEventProcessor(SmartHome smartHome) {
+    DoorEventHandler(SmartHome smartHome) {
         if (smartHome == null) throw new IllegalArgumentException("Null input");
         this.smartHome = smartHome;
     }

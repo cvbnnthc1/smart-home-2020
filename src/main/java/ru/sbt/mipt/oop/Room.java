@@ -20,12 +20,12 @@ public class Room implements Actionable{
 
     @Override
     public boolean execute(Function<Actionable, Boolean> action) {
-        action.apply(this);
+        boolean resultItSelf = action.apply(this);
         Boolean resultLights;
         Boolean resultDoors;
         resultLights = lights.stream().map(s -> s.execute(action)).reduce((x, y) -> x || y).get();
         resultDoors = doors.stream().map(s -> s.execute(action)).reduce((x, y) -> x || y).get();
-        return resultLights || resultDoors;
+        return resultLights || resultDoors || resultItSelf;
     }
 
 }

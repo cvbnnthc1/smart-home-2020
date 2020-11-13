@@ -12,13 +12,19 @@ public class Application {
         String source = "smart-home-1.js";
         SmartHome smartHome = reader.readSmartHome(source);
         // начинаем цикл обработки событий
-        SensorEventProvider sensorEventProvider = new RandomSensorEventProvider();
-        List<EventProcessor> processors = new ArrayList<>();
-        processors.add(new DoorEventProcessor(smartHome));
-        processors.add(new LightEventProcessor(smartHome));
-        processors.add(new HallDoorEventProcessor(smartHome));
-        ProcessingScript processor = new StandardProcessingScript(processors);
-        processor.executeScript(smartHome, sensorEventProvider);
+        SensorEventProvider sensor = new RandomSensorEventProvider();
+        Signalization signalization = new Signalization();
+        signalization.setState(new Deactivated(signalization));
+        List<EventHandler> processors = new ArrayList<>();
+        CommandSender commandSender = new CommandSenderImpl();
+        processors.add(new EventHandlerDecorator(new DoorEventHandler(smartHome), signalization));
+        processors.add(new EventHandlerDecorator(new LightEventHandler(smartHome), signalization));
+        processors.add(new EventHandlerDecorator(new HallDoorEventHandler(smartHome, commandSender), signalization));
+        processors.add(new EventHandlerDecorator(new SignalizationEventHandler(signalization), signalization));
+        processors.add(new SignalizationEventHandler(signalization));
+        signalization.setState(new Deactivated(signalization));
+        EventManager processor = new StandardEventManager(processors, sensor);
+        processor.start();
     }
 
 }
