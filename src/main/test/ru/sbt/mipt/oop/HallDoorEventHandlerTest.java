@@ -3,14 +3,18 @@ package ru.sbt.mipt.oop;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import static org.junit.Assert.*;
 
-public class DoorEventProcessorTest {
+public class HallDoorEventHandlerTest {
     SmartHome smartHome;
     Map<String, List<Door>> doorsByRoom = new HashMap<>();
     Map<String, List<Light>> lightsByRoom = new HashMap<>();
+    CommandSender commandSender;
 
     @Before
     public void readHome() {
@@ -23,7 +27,7 @@ public class DoorEventProcessorTest {
         doorsByRoom.put("bathroom",  Arrays.asList(new Door(false, "2", "bathroom")));
         lightsByRoom.put("bathroom",  Arrays.asList(new Light("3", true)));
         Room bathroom = new Room(lightsByRoom.get("bathroom"),
-               doorsByRoom.get("bathroom"), "bathroom");
+                doorsByRoom.get("bathroom"), "bathroom");
         doorsByRoom.put("bedroom",  Arrays.asList(new Door(true, "3", "bedroom")));
         lightsByRoom.put("bedroom",  Arrays.asList(new Light("4", false), new Light("5", false), new Light("6", false)));
         Room bedroom = new Room(lightsByRoom.get("bedroom"), doorsByRoom.get("bedroom"), "bedroom");
@@ -32,31 +36,39 @@ public class DoorEventProcessorTest {
         Room hall = new Room(lightsByRoom.get("hall"),
                 doorsByRoom.get("hall"), "hall");
         SmartHome smartHome = new SmartHome(Arrays.asList(kitchen, bathroom, bedroom, hall));
+        commandSender = new CommandSenderImpl();
         this.smartHome = smartHome;
     }
 
     @Test
-    public void processEvent_openFirstDoor() {
+    public void processEvent_offAllLights() {
         //given
-        DoorEventProcessor doorEventProcessor = new DoorEventProcessor(smartHome);
+        HallDoorEventHandler hallDoorEventProcessor = new HallDoorEventHandler(smartHome, commandSender);
         //when
-        doorEventProcessor.processEvent(new SensorEvent(SensorEventType.DOOR_OPEN, "1"));
-        Door result = doorsByRoom.get("kitchen").get(0);
+        hallDoorEventProcessor.processEvent(new SensorEvent(SensorEventType.DOOR_CLOSED, "4"));
         //then
-        assertEquals("1", result.getId());
-        assertTrue(result.isOpen());
+        for (String room: lightsByRoom.keySet()) {
+            for (Light light: lightsByRoom.get(room)) {
+                assertFalse(light.isOn());
+            }
+        }
     }
 
     @Test
-    public void processEvent_closeFirstDoor() {
+    public void processEvent_offAllLightsAfterOnAllLights() {
         //given
-        DoorEventProcessor doorEventProcessor = new DoorEventProcessor(smartHome);
+        HallDoorEventHandler hallDoorEventProcessor = new HallDoorEventHandler(smartHome, commandSender);
         //when
-        doorEventProcessor.processEvent(new SensorEvent(SensorEventType.DOOR_CLOSED, "1"));
-        Door result = doorsByRoom.get("kitchen").get(0);
+        for (int i = 1; i < 10; i++) {
+            new LightEventHandler(smartHome).processEvent(new SensorEvent(SensorEventType.LIGHT_ON, "" + i));
+        }
+        hallDoorEventProcessor.processEvent(new SensorEvent(SensorEventType.DOOR_CLOSED, "4"));
         //then
-        assertEquals("1", result.getId());
-        assertFalse(result.isOpen());
+        for (String room: lightsByRoom.keySet()) {
+            for (Light light: lightsByRoom.get(room)) {
+                assertFalse(light.isOn());
+            }
+        }
     }
 
 

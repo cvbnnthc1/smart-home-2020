@@ -3,10 +3,10 @@ package ru.sbt.mipt.oop;
 import static ru.sbt.mipt.oop.SensorEventType.LIGHT_ON;
 import static ru.sbt.mipt.oop.SensorEventType.LIGHT_OFF;
 
-public class LightEventProcessor implements EventProcessor {
+public class LightEventHandler implements EventHandler {
     private final SmartHome smartHome;
 
-    LightEventProcessor(SmartHome smartHome) {
+    LightEventHandler(SmartHome smartHome) {
         if (smartHome == null) throw new IllegalArgumentException("Null input");
         this.smartHome = smartHome;
     }
